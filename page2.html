@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.2/journal/bootstrap.min.css">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="./d3.doublebarchart2.js"></script>
+<script src="./responsivefy.js"></script>
+<script src="./binomial.js"></script>
+<script src="d3.linechart.js"></script>
+    
+<style>
+.container {
+margin-right: auto;
+margin-left: auto;
+padding-left: 15px;
+padding-right: 15px;
+}
+@media (min-width: 1200px)
+.container {
+width: 1170px;
+}
+@media (min-width: 992px)
+.container {
+width: 970px;
+}
+@media (min-width: 768px)
+.container {
+width: 750px;
+}
+.page-header {
+padding-bottom: 9px;
+margin: 40px 0 20px;
+border-bottom: 1px solid #EEE;
+}
+p {
+margin: 0 0 10px;
+}
+footer {
+margin: 5em 0;
+}
+.list-unstyled {
+padding-left: 0;
+list-style: none;
+}
+
+       
+            .tick {
+			  fill-opacity: 0;
+			  stroke: #000000;
+			  stroke-width: 1;
+			}
+			
+			.domain {
+			    fill: none;
+				fill-opacity: 0;
+				stroke: black;
+				stroke-width: 1;
+			}
+			.axis line {
+				fill: none;
+				fill-opacity: 0;
+				stroke: black;
+				stroke-width: 1;
+				shape-rendering: crispEdges;
+			}
+			
+			.axis text {
+				font-family: sans-serif;
+				font-size: 11px;
+				stroke: gray;
+			}
+			
+			  .block {
+                border-style: solid;
+                border-width: 3px;
+                width: 8em;
+                height: 8em;
+                border-radius: 8px;
+                margin: 8px;
+                display: inline-block;
+              }
+
+                .number {
+                    font-family: "News Cycle","Arial Narrow Bold",sans-serif;
+                    font-weight: 700;
+                    line-height: 1.1;
+                    color: #000;
+                }
+                
+                .axis path,
+                .axis line {
+                  fill: none;
+                  stroke: #ccc;
+                  shape-rendering: crispEdges;
+                }
+
+                .y.axis {
+                    stroke-width: 0;
+                }                
+                .band {
+                  fill-opacity: 0.05;
+                }
+
+                .band:hover {
+                  fill-opacity: 0.6
+                }
+</style>
+
+<body>
+<div class="navbar navbar-inverse navbar-static-top hidden-print">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <i class="fa fa-bars fa-lg"></i>
+      </button>
+      <a class="navbar-brand" href="./"><i class="fa fa-bar-chart"></i> pollster.eu</a>
+    </div>
+
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Česká republika <i class="fa fa-caret-down"></i></a>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Česká republika</a></li>
+                <li><a href="#">Slovensko</a></li>
+            </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">čeština <i class="fa fa-caret-down"></i></a>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#">čeština</a></li>
+                <li><a href="#">English</a></li>
+            </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="container">
+
+
+
+
+  <div class="row">
+    <div class="col-md-6">
+      <section id="id1" name="id1">
+        <h2 class="page-header" style="margin-top:20px">Volební model <small>s odhadem jeho nejistoty</small> <span class="badge">13.3.2015</span></h2>
+        <div id="chart1" style="max-width:666px"></div>
+        <p> 
+        <a href="#id1" data-toggle="modal" data-target="#info1"><span class="fa-stack fa-lg">
+                  <i class="fa fa-square-o fa-stack-2x"></i>
+                  <i class="fa fa-info fa-stack-1x"></i>
+                </span></a>
+        <a href="#"><span class="fa-stack fa-lg">
+                  <i class="fa fa-square-o fa-stack-2x"></i>
+                  <i class="fa fa-twitter fa-stack-1x"></i>
+                </span></a>
+                <a href="#"><span class="fa-stack fa-lg">
+                  <i class="fa fa-square-o fa-stack-2x"></i>
+                  <i class="fa fa-facebook fa-stack-1x"></i>
+                </span></a>
+                
+                
+<!-- Modal -->
+<div class="modal fade" id="info1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Volební model v čase <small>s odhadem jeho chyby</small></h4>
+      </div>
+      <div class="modal-body">
+            <p>Volební model co nejlépe odhaduje, jak by dopadly volby nyní.
+            <p>Nejistota modelu je dána statistickou chybou a dalšími vlivy.
+            <p>Volební model je založen na průzkumech <a href="#">CVVM</a>, <a href="#">ABC</a>.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Fajn</button>
+      </div>
+    </div>
+  </div>
+</div>
+      </section>
+    </div>
+        
+    <div class="col-md-6">
+    
+        <section id="id2" name="id2">
+            <div> 
+                <h2 class="page-header" style="margin-top:20px">Odhad počtu poslanců <small>s odhadem chyby</small> <span class="badge">14.3.2015</span> <span class="label label-info" style="font-size:0.25em;position:relative;bottom:5px;">Experimentální</span></h2>
+            </div>
+            <div id="chart2">
+                <div class="block" style="border-color:#abc;position:relative">
+                    <div class="">
+                        <h4 style="color:#abc;padding-left:2px;margin-bottom: 0px;">ANO</h4>
+                    </div>
+                    <div class="pull-rightx">
+                            
+                        </div>
+                    <div class="text-center">
+                        <span class="number" style="font-size:3em;">78</span>
+                    </div>
+                    <div class="text-center">
+                        ±12
+                    </div>
+                    <div style="position:absolute;top:3em;left:5.5em;">
+                        <span class="text-success">▲</span>31
+                    </div>
+                </div>
+                <div class="block" style="border-color:orange;position:relative">
+                    <div class="">
+                        <h4 style="color:orange;padding-left:2px;margin-bottom: 0px;">ČSSD</h4>
+                    </div>
+                    <div class="pull-rightx">
+                            
+                        </div>
+                    <div class="text-center">
+                        <span class="number" style="font-size:3em;">68</span>
+                    </div>
+                    <div class="text-center">
+                        ±12
+                    </div>
+                    <div style="position:absolute;top:3em;left:5.5em;">
+                        <span class="text-success">▲</span>18
+                    </div>
+                </div>
+                <div class="block" style="border-color:red;position:relative">
+                    <div class="">
+                        <h4 style="color:red;padding-left:2px;margin-bottom: 0px;">KSČM</h4>
+                    </div>
+                    <div class="pull-rightx">
+                            
+                        </div>
+                    <div class="text-center">
+                        <span class="number" style="font-size:3em;">24</span>
+                    </div>
+                    <div class="text-center">
+                        ±9
+                    </div>
+                    <div style="position:absolute;top:3em;left:5.5em;">
+                        <span class="text-danger">▼</span>9
+                    </div>
+                </div>
+                <div class="block" style="border-color:#808;position:relative">
+                    <div class="">
+                        <h4 style="color:#808;padding-left:2px;margin-bottom: 0px;">TOP 09</h4>
+                    </div>
+                    <div class="pull-rightx">
+                            
+                        </div>
+                    <div class="text-center">
+                        <span class="number" style="font-size:3em;">15</span>
+                    </div>
+                    <div class="text-center">
+                        ±7
+                    </div>
+                    <div style="position:absolute;top:3em;left:5.5em;">
+                        <span class="text-danger">▼</span>11
+                    </div>
+                </div>
+                
+                <div class="block" style="border-color:gold;position:relative">
+                    <div class="">
+                        <h4 style="color:gold;padding-left:2px;margin-bottom: 0px;">KDU-ČSL</h4>
+                    </div>
+                    <div class="pull-rightx">
+                            
+                        </div>
+                    <div class="text-center">
+                        <span class="number" style="font-size:3em;">11</span>
+                    </div>
+                    <div class="text-center">
+                        ±6
+                    </div>
+                    <div style="position:absolute;top:3em;left:5.5em;">
+                        <span class="text-danger">▼</span>3
+                    </div>
+                </div>
+
+                <div class="block" style="border-color:blue;position:relative">
+                    <div class="">
+                        <h4 style="color:blue;padding-left:2px;margin-bottom: 0px;">ODS</h4>
+                    </div>
+                    <div class="pull-rightx">
+                            
+                        </div>
+                    <div class="text-center">
+                        <span class="number" style="font-size:3em;">9</span>
+                    </div>
+                    <div class="text-center">
+                        ±6
+                    </div>
+                    <div style="position:absolute;top:3em;left:5.5em;">
+                        <span class="text-danger">▼</span>7
+                    </div>
+                </div>
+
+                <div class="block" style="border-color:black;position:relative">
+                    <div class="">
+                        <h4 style="color:black;padding-left:2px;margin-bottom: 0px;">Piráti</h4>
+                    </div>
+                    <div class="pull-rightx">
+                            
+                        </div>
+                    <div class="text-center">
+                        <span class="number" style="font-size:3em;">0</span>
+                    </div>
+                    <div class="text-center">
+                        ±5
+                    </div>
+                    <div style="position:absolute;top:3em;left:5.5em;">
+                        <span class="text-muted">⚫</span>0
+                    </div>
+                </div>
+
+                <div class="block" style="border-color:pink;position:relative">
+                    <div class="">
+                        <h4 style="color:pink;padding-left:2px;margin-bottom: 0px;">Úsvit</h4>
+                    </div>
+                    <div class="pull-rightx">
+                            
+                        </div>
+                    <div class="text-center">
+                        <span class="number" style="font-size:3em;">0</span>
+                    </div>
+                    <div class="text-center">
+                        ±4
+                    </div>
+                    <div style="position:absolute;top:3em;left:5.5em;">
+                        <span class="text-danger">▼</span>14
+                    </div>
+                </div>
+                
+                <p> 
+                <a href="#id2" data-toggle="modal" data-target="#info2"><span class="fa-stack fa-lg">
+                  <i class="fa fa-square-o fa-stack-2x"></i>
+                  <i class="fa fa-info fa-stack-1x"></i>
+                </span></a>
+                <a href="#"><span class="fa-stack fa-lg">
+                  <i class="fa fa-square-o fa-stack-2x"></i>
+                  <i class="fa fa-twitter fa-stack-1x"></i>
+                </span></a>
+                <a href="#"><span class="fa-stack fa-lg">
+                  <i class="fa fa-square-o fa-stack-2x"></i>
+                  <i class="fa fa-facebook fa-stack-1x"></i>
+                </span></a>
+                
+                
+            </div>
+
+<!-- Modal -->
+<div class="modal fade" id="info2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Volební model v čase <small>s odhadem jeho chyby</small></h4>
+      </div>
+      <div class="modal-body">
+            <p>Odhad počtu poslanců je založen na volebním modelu.
+            <p>Nejistota je dána také různou podporou stran v různých krajích.
+            <p>Odhad je založen na průzkumech <a href="#">CVVM</a>, <a href="#">ABC</a>.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Fajn</button>
+      </div>
+    </div>
+  </div>
+</div>
+           
+        </section>    
+    
+    
+    
+    </div>
+  </div>
+
+<section id="id3" name="#id3">
+    <div > 
+        <h2 class="page-header">Volební model v čase <small>s odhadem jeho chyby</small> <span class="badge">13.3.2015</span></h2>
+    </div>
+
+    <div id="chart3" style="max-width:960px"></div>
+    
+    <p> 
+                <a href="#id3" data-toggle="modal" data-target="#info3"><span class="fa-stack fa-lg">
+                  <i class="fa fa-square-o fa-stack-2x"></i>
+                  <i class="fa fa-info fa-stack-1x"></i>
+                </span></a>
+                <a href="#"><span class="fa-stack fa-lg">
+                  <i class="fa fa-square-o fa-stack-2x"></i>
+                  <i class="fa fa-twitter fa-stack-1x"></i>
+                </span></a>
+                <a href="#"><span class="fa-stack fa-lg">
+                  <i class="fa fa-square-o fa-stack-2x"></i>
+                  <i class="fa fa-facebook fa-stack-1x"></i>
+                </span></a>
+
+<!-- Modal -->
+<div class="modal fade" id="info3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Volební model v čase <small>s odhadem jeho chyby</small></h4>
+      </div>
+      <div class="modal-body">
+            <p>Volební model co nejlépe odhaduje, jak by dopadly volby v daném okamžiku.
+            <p>Nejistota modelu je dána <a href="http://cs.wikipedia.org/wiki/Chyba_m%C4%9B%C5%99en%C3%AD" target="_blank">statistickou chybou</a> a dalšími vlivy jako <a href="http://en.wikipedia.org/wiki/Response_rate">počtem lidí, kteří odmítnou se průzkumů zůčastnit</a>.
+            <p>Volební model je založen na průzkumech <a href="#">CVVM</a>, <a href="#">ABC</a> a počítá se <a href="#">takto</a>.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Fajn</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</section>    
+ <footer id="footer">
+   <div class="row">
+     <a href="#">O projektu</a> <a href="#" style="margin-left:2em">Data</a> <a href="#" style="margin-left:2em">Data</a> ...
+  </div>
+</footer> 
+
+</div> <!-- /container -->
+
+<script>
+    var margin = {top: 20, right: 0, bottom: 20, left: 0},
+        width = 600 - margin.left - margin.right,
+        height = 250 - margin.top - margin.bottom;
+
+    var doublebarchart = [{
+        "data": [
+            {"name":"ANO","value":0.31, "value_old": 0.1865, "color": "#abc", "id": "ano", "legend_small": " ±7%"},
+            {"name":"ČSSD","value": 0.28, "value_old": 0.2045, "color": "orange", "id":"cssd", "legend_small": " ±6%"},
+            {"name":"KSČM","value":0.115, "value_old": 0.1491, "color": "red", "id": "kscm", "legend_small": " ±4%"},
+            {"name":"TOP 09","value":0.075, "value_old": 0.1199, "color": "#808", "legend_small": " ±3.5%"},
+            {"name":"KDU-ČSL","value":0.06, "value_old": 0.0678, "color": "gold", "legend_small": " ±3.5%"},
+            {"name":"ODS","value":0.05, "value_old": 0.0772, "color": "blue", "legend_small": " ±3%"},
+            {"name":"Piráti","value":0.03, "value_old": 0.0266, "color": "black", "legend_small": " ±3%"},
+            {"name": "Úsvit", "value": 0.025, "value_old": 0.0688, "color": "pink", "legend_small": " ±3%"},
+            {"name": "Zelení", "value": 0.025, "value_old": 0.0319, "color": "green", "legend_small": " ±3%"},
+            {"name": "Ostatní", "value": 0.03, "color": "gray"}
+            
+        ],
+        "size": {"width": width, "height": height},
+        "margin": margin,
+        "threshold": 0.05
+    }];
+    
+     var svg = d3.select("#chart1")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .call(responsivefy);
+
+    var dbc = d3.doublebarchart()
+        .data(function(d) {return d.data})
+        .size(function(d) {return d.size})
+        .threshold(function(d) {return d.threshold})
+        ;
+
+    var bar = svg.selectAll(".barchart")
+        .data(doublebarchart)
+      .enter()
+        .append("svg:g")
+        .attr("transform", "translate(" + doublebarchart[0].margin.left + "," + doublebarchart[0].margin.top + ")")
+        .call(dbc);
+
+
+
+
+
+
+
+
+    
+    var json = (function () {
+        var json = null;
+        $.ajax({
+            'async': false,
+            'global': false,
+            'url': "./linedata.json",
+            'dataType': "json",
+            'success': function (data) {
+                json = data;
+            }
+        });
+        return json;
+    })();
+
+    width = getParameterByName('width');
+    height = getParameterByName('height');
+    if ((width == '') || (!isNumeric(width)) || width < 10) width = 960;
+    if (height == '') height = 400;
+    
+    var linechart = [{
+      "data":json,
+      "intervals": "real",
+      "interpolation": "nevim",
+      "width": width,
+      "height": height,
+      "limit": 0.05
+    }];
+    
+    var w=width,h=height,
+        svg=d3.select("#chart3")
+            .append("svg")
+            .attr("width",w)
+            .attr("height",h)
+            .call(responsivefy);
+    var lc = d3.linechart()
+                .data(function(d) {
+                  nothing = 0;
+                  return d.data;
+                })
+                .intervals(function(d) {return d.intervals;})
+                .interpolation(function(d) {return d.interpolation;})
+                .width(function(d) {return d.width;})
+                .height(function(d) {return d.height;}); 
+                
+    var item = svg.selectAll(".linechart")
+      .data(linechart)
+   .enter()
+    .append("svg:g")
+    .call(lc);
+
+    $('.axis path').attr('stroke','#ccc').attr('fill','none').attr('shape-rendering','crispEdges');
+    $('.axis line').attr('stroke','#ccc').attr('fill','none').attr('shape-rendering','crispEdges');
+    $('.axis text').attr('font-size','10px').attr('fill','#666').attr('shape-rendering','crispEdges');
+ 
+ 
+   
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+
+
+      
+</script>

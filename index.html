@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.2/journal/bootstrap.min.css">
+
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="./d3.doublebarchart2.js"></script>
+    <script src="./responsivefy.js"></script>
+    <script src="./binomial.js"></script>
+    <style>
+        .tick {
+			  fill-opacity: 0;
+			  stroke: #000000;
+			  stroke-width: 1;
+			}
+			
+			.domain {
+			    fill: none;
+				fill-opacity: 0;
+				stroke: black;
+				stroke-width: 1;
+			}
+			.axis line {
+				fill: none;
+				fill-opacity: 0;
+				stroke: black;
+				stroke-width: 1;
+				shape-rendering: crispEdges;
+			}
+			
+			.axis text {
+				font-family: sans-serif;
+				font-size: 11px;
+				stroke: gray;
+			}
+    </style>
+<body>
+<div style="margin:20px"> 
+    <h3>Poll projection <small>with error estimates</small> <span class="badge">Mar 13 2015</span></h3>
+    <div id="chart" style="max-width:500px"></div>
+</div>
+<script>
+    var margin = {top: 20, right: 0, bottom: 20, left: 0},
+        width = 500 - margin.left - margin.right,
+        height = 200 - margin.top - margin.bottom;
+
+    var doublebarchart = [{
+        "data": [
+            {"name":"ANO","value":0.31, "value_old": 0.1865, "color": "#abc", "id": "ano", "legend_small": " ±7%"},
+            {"name":"ČSSD","value": 0.28, "value_old": 0.2045, "color": "orange", "id":"cssd", "legend_small": " ±6%"},
+            {"name":"KSČM","value":0.115, "value_old": 0.1491, "color": "red", "id": "kscm", "legend_small": " ±4%"},
+            {"name":"TOP 09","value":0.075, "value_old": 0.1199, "color": "#808", "legend_small": " ±3.5%"},
+            {"name":"KDU-ČSL","value":0.06, "value_old": 0.0678, "color": "gold", "legend_small": " ±3.5%"},
+            {"name":"ODS","value":0.05, "value_old": 0.0772, "color": "blue", "legend_small": " ±3%"},
+            {"name":"Piráti","value":0.03, "value_old": 0.0266, "color": "black", "legend_small": " ±3%"},
+            {"name": "Úsvit", "value": 0.025, "value_old": 0.0688, "color": "pink", "legend_small": " ±3%"},
+            {"name": "Zelení", "value": 0.025, "value_old": 0.0319, "color": "green", "legend_small": " ±3%"},
+            {"name": "Ostatní", "value": 0.03, "color": "gray"}
+            
+        ],
+        "size": {"width": width, "height": height},
+        "margin": margin,
+        "threshold": 0.05
+    }];
+    
+     var svg = d3.select("#chart")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .call(responsivefy);
+
+    var dbc = d3.doublebarchart()
+        .data(function(d) {return d.data})
+        .size(function(d) {return d.size})
+        .threshold(function(d) {return d.threshold})
+        ;
+
+    var bar = svg.selectAll(".barchart")
+        .data(doublebarchart)
+      .enter()
+        .append("svg:g")
+        .attr("transform", "translate(" + doublebarchart[0].margin.left + "," + doublebarchart[0].margin.top + ")")
+        .call(dbc);
+        
+</script>
+

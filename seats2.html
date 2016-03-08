@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.2/journal/bootstrap.min.css">
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<body>
+<div style="margin:20px"> 
+    <h3>Odhad počtu poslanců <small>s odhadem chyby</small> <span class="badge">14.3.2015</span> <span class="label label-info" style="font-size:0.33em;position:relative;bottom:5px;">Experimentální</span></h3>
+    <div id="chart" style="max-width:700px;"></div>
+    
+    
+    
+    <script>
+        var data = [
+            {"name": 'ANO', 'now': 78, 'move': 'up', 'moven': 31, 'var': 12, 'color': '#abc'},
+            {"name": 'ČSSD', 'now': 68, 'move': 'up', 'moven': 18, 'var': 12, 'color': 'orange'},
+            {"name": 'KSČM', 'now': 24, 'move': 'down', 'moven': 9, 'var': 9, 'color': 'red'},
+            {"name": 'TOP 09', 'now': 15, 'move': 'down', 'moven': 11, 'var': 7, 'color': '#808'},
+            {"name": 'KDU-ČSL', 'now': 11, 'move': 'down', 'moven': 3, 'var': 6, 'color': 'gold'},
+            {"name": 'ODS', 'now': 9, 'move': 'down', 'moven': 7, 'var': 6, 'color': 'blue'},
+        ];
+        hcol = 10 
+        ncol = data.length - 1;
+        for (i=0; i<data.length; i++) {
+            ncol = ncol + Math.ceil(data[i]['now']/hcol);
+        }
+        var x = d3.scale.linear()
+                .domain([0,ncol])
+                .range([0,700]);
+        var y = d3.scale.linear()
+                .domain([0,hcol])
+                .range([300,0]);
+        
+        ccol = 0;
+        pos = 0;
+        var svg = d3.select("#chart").append("svg").attr("width",700).attr("height",450);
+        for (i=0; i<data.length; i++) {
+            if (i>0)
+                ccol = ccol + Math.ceil(data[i-1]['now'] / hcol);
+            for (j=0; j<data[i]['now'];j++) {
+                svg.append("text")
+                    .attr("font-size",30)
+                    .attr("x",function() {
+                        return x(ccol + Math.floor(j / hcol) + 0.5);
+                    })
+                    .attr("y",function() {
+                        return y(j % hcol);
+                    })
+                    .attr('text-anchor',"middle")
+                    .attr('fill',function() {return data[i]['color']}) 
+                    .attr('font-family', 'FontAwesome')
+                    .text('\uf007')
+            }
+
+            if (i>0) {
+                if (pos > 0)
+                    pos = 0;
+                else {
+                    if (data[i-1]['now'] / hcol <= 5)
+                        pos = 1;
+                }
+            }
+            
+            svg.append("text")
+                .attr('fill',function() {return data[i]['color']})
+                .attr("x",function() {
+                    return x(ccol + Math.ceil(data[i]['now']/hcol)/2);
+                })
+                .attr("y",function() {
+                    return y(-1 - 2*pos);
+                })
+                .attr("text-anchor","middle")
+                .attr("font-size",30)
+                .attr("font-family",'"News Cycle","Arial Narrow Bold",sans-serif')
+                .attr("font-weight",700)
+                .text(data[i]['name']);
+            
+            var text = svg.append("text")
+                .attr('fill',function() {return data[i]['color']})
+                .attr("x",function() {
+                    return x(ccol + Math.ceil(data[i]['now']/hcol)/2);
+                })
+                .attr("y",function() {
+                    return y(-2 - 2*pos);
+                })
+                .attr("text-anchor","middle")
+                .attr("font-family",'"News Cycle","Arial Narrow Bold",sans-serif')
+                ;
+                
+            text.append("tspan")
+                .attr("font-size",30)
+                .text(data[i]['now'])
+                .attr("font-weight",700);
+            
+            text.append("tspan")
+                .attr("font-size",15)
+                .text(function() {return "±" + data[i]['var']});
+  
+        }
+    </script>

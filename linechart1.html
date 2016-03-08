@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.3.2/journal/bootstrap.min.css">
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="d3.linechart.js"></script>
+<script src="d3.tooltip.js"></script>
+<script src="./binomial.js"></script>
+<script src="./responsivefy.js"></script>
+
+<style>
+body {
+  font: 10px sans-serif;
+}
+
+
+/*.axis text {
+  font: 10px sans-serif;
+  fill: #666;
+}*/
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #ccc;
+  shape-rendering: crispEdges;
+}
+
+.y.axis {
+    stroke-width: 0;
+}
+
+.band {
+  fill-opacity: 0.05;
+}
+
+.band:hover {
+  fill-opacity: 0.6
+}
+
+.tooltip {
+	  	font-family: sans-serif;
+	  	font-size: 11px;
+	  	z-index: 50;
+	  	position: absolute;
+	  	border: 1px solid #888;
+	  	color: #fff;
+	  	border-radius: 4px;
+	  	background: rgba(0, 0, 0, 0.8);
+	  	padding: 12px;
+	  	margin-top: -8px;
+	  	margin-left: 0px;
+	  	box-shadow: #aaa 0px 0px 1px;
+	}
+
+	.tooltip p.only-child {
+  		margin: 0px;
+	}
+</style>
+  </head>
+  
+  
+  <body> 
+    <div style="margin:20px"> 
+        <h3>Poll projection over time <small>with error estimates</small> <span class="badge">Mar 14 2015</span></h3>
+    <div id="chart" style="max-width:900px;max-height:600px"></div>
+    </div>
+<script type="text/javascript">
+    new Tooltip().watchElements();
+    
+    var json = (function () {
+        var json = null;
+        $.ajax({
+            'async': false,
+            'global': false,
+            'url': "./linedata.json",
+            'dataType': "json",
+            'success': function (data) {
+                json = data;
+            }
+        });
+        return json;
+    })();
+
+    width = getParameterByName('width');
+    height = getParameterByName('height');
+    if ((width == '') || (!isNumeric(width)) || width < 10) width = 900;
+    if (height == '') height = 600;
+    
+    var linechart = [{
+      "data":json,
+      "intervals": "real",
+      "interpolation": "nevim",
+      "width": width,
+      "height": height,
+      "limit": 0.05
+    }];
+    
+    var w=width,h=height,
+        svg=d3.select("#chart")
+            .append("svg")
+            .attr("width",w)
+            .attr("height",h)
+            .call(responsivefy);
+    var lc = d3.linechart()
+                .data(function(d) {
+                  nothing = 0;
+                  return d.data;
+                })
+                .intervals(function(d) {return d.intervals;})
+                .interpolation(function(d) {return d.interpolation;})
+                .width(function(d) {return d.width;})
+                .height(function(d) {return d.height;}); 
+                
+    var item = svg.selectAll(".linechart")
+      .data(linechart)
+   .enter()
+    .append("svg:g")
+    .call(lc);
+
+    $('.axis path').attr('stroke','#ccc').attr('fill','none').attr('shape-rendering','crispEdges');
+    $('.axis line').attr('stroke','#ccc').attr('fill','none').attr('shape-rendering','crispEdges');
+    $('.axis text').attr('font-size','10px').attr('fill','#666').attr('shape-rendering','crispEdges');
+ 
+ 
+   
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+function isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+</script>
+</body>
+</html>
+
